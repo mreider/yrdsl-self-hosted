@@ -1,0 +1,26 @@
+{
+  "name": "yrdsl-self-hosted",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A yard sale you self-host. Edit site.json + items.json, push, GitHub Pages serves it.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "validate": "node scripts/validate.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.3"
+  }
+}

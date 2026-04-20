@@ -1,0 +1,20 @@
+{
+  "siteName": "My Yard Sale",
+  "subtitle": "everything must go",
+  "location": "Austin, TX",
+  "description": "We're moving and can't take it all. Come grab something.",
+  "theme": "conservative",
+  "currency": "USD",
+  "language": "en",
+  "endsAt": "2026-06-01T17:00:00-05:00",
+  "contact": {
+    "email": "you@example.com",
+    "sms": "15125551234",
+    "whatsapp": "15125551234",
+    "notes": "Cash or Venmo. Pickup only."
+  },
+  "about": {
+    "heading": "Why we're selling",
+    "body": "We're downsizing. Everything here is in working condition, lightly used, and priced to move. Message us to set up a time."
+  }
+}

@@ -1,0 +1,4 @@
+export { SaleViewer } from './SaleViewer.js';
+export type { SaleViewerProps } from './SaleViewer.js';
+// Re-export the canonical types so consumers don't have to pull in @yard-sale/core directly.
+export type { SaleSite, SaleItem, SaleAbout, SaleContact, ReservationInfo } from '../core/sale.js';
