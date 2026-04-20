@@ -128,7 +128,7 @@ scripts/validate.mjs # pre-deploy JSON validation
 `site.json` and `items.json` validate against the zod schemas in
 `src/vendor/core/sale.ts`. The same shapes are produced by the hosted
 version of yrdsl.app, so you can move data between modes losslessly. See
-the [PRD §4.4](https://github.com/KuvopLLC/yard-sale/blob/main/PRD.md#44-distribution-modes)
+the [PRD §4.4](https://github.com/KuvopLLC/yrdsl/blob/main/PRD.md#44-distribution-modes)
 for the full hosted-vs-self-hosted comparison.
 
 ## Want the hosted version instead?
@@ -139,7 +139,7 @@ over MCP from your phone, and metered billing, sign up at
 
 ## Upstream
 
-The renderer source lives at <https://github.com/KuvopLLC/yard-sale> in
+The renderer source lives at <https://github.com/KuvopLLC/yrdsl> in
 `packages/viewer`. To pull a new version into your fork's `src/vendor/`,
 copy the files over and bump the deps in `package.json`. A vendor-refresh
 script is planned but not built.
