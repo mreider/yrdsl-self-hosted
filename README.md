@@ -91,6 +91,15 @@ Windows: `%APPDATA%\Claude\claude_desktop_config.json`):
 }
 ```
 
+**Heads up on `commit_and_push`:** the MCP doesn't carry a GitHub
+token of its own. When Claude calls `commit_and_push` it runs `git push`
+in your fork's directory and uses whatever auth your local git has set
+up (SSH key, gh-CLI credential helper, baked-in HTTPS token, etc.). If
+`git push` works in your terminal from your fork's directory, it'll
+work through Claude. If you've never pushed from that directory, run
+`gh auth login` once (or set up your SSH key) before asking Claude to
+deploy.
+
 For a **hosted** yrdsl.app sale instead of this self-hosted repo, swap
 the `env` block:
 
