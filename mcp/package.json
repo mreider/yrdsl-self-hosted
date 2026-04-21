@@ -1,11 +1,11 @@
 {
-  "name": "yrdsl-mcp",
+  "name": "yrdsl-self-hosted-mcp",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local MCP server that lets Claude Desktop edit a yrdsl-self-hosted yard sale repo.",
+  "description": "Vendored copy of @yrdsl/mcp. The unified MCP server that lets Claude Desktop edit either this self-hosted repo OR a hosted yrdsl.app sale.",
   "bin": {
-    "yrdsl-mcp": "./server.mjs"
+    "yrdsl-mcp": "./dist/index.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

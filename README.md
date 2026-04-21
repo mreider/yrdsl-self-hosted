@@ -66,9 +66,9 @@ installed.
 
 ### Claude Desktop via MCP (works from the desktop app chat)
 
-This repo ships an MCP server at `mcp/server.mjs` that exposes typed
-tools (`add_item`, `mark_reserved`, `update_site`, `commit_and_push`,
-etc.) to Claude Desktop. One-time setup:
+This repo ships the unified `yrdsl-mcp` server at `mcp/`. Same binary
+also works against a hosted yrdsl.app sale — same tool catalog, same
+prompts. One-time setup:
 
 ```bash
 cd mcp
@@ -84,12 +84,25 @@ Windows: `%APPDATA%\Claude\claude_desktop_config.json`):
   "mcpServers": {
     "yrdsl": {
       "command": "node",
-      "args": ["/absolute/path/to/your-fork/mcp/server.mjs"],
+      "args": ["/absolute/path/to/your-fork/mcp/dist/index.js"],
       "env": { "YRDSL_REPO": "/absolute/path/to/your-fork" }
     }
   }
 }
 ```
+
+For a **hosted** yrdsl.app sale instead of this self-hosted repo, swap
+the `env` block:
+
+```json
+"env": {
+  "YRDSL_API_TOKEN": "yrs_live_...",
+  "YRDSL_SALE_ID": "01ABC..."
+}
+```
+
+(Generate the token at <https://app.yrdsl.app/tokens> and find the sale
+id in the URL when editing on `app.yrdsl.app/sales/<id>`.)
 
 Restart Claude Desktop. You'll see the "yrdsl" server listed in the
 MCP menu; Claude can now edit the sale directly from any chat.
