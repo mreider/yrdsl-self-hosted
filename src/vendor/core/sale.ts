@@ -66,22 +66,12 @@ export const SaleItem = z.object({
 });
 export type SaleItem = z.infer<typeof SaleItem>;
 
-export const SaleAbout = z.object({
-  image: z.string().optional(),
-  imageAlt: z.string().optional(),
-  heading: z.string(),
-  body: z.string(),
-});
-export type SaleAbout = z.infer<typeof SaleAbout>;
-
 export const SaleContact = z.object({
   email: z.string().email().optional(),
   /** Digits only, E.164 without the "+" (e.g. "15125551234"). Drives tel: links. */
   sms: z.string().optional(),
   /** Same format as sms; drives wa.me/<number> links. */
   whatsapp: z.string().optional(),
-  /** Host-only: when true the hosted platform exposes a relay form. Self-hosted ignores. */
-  useRelay: z.boolean().optional(),
   /** Host-only: free-form seller note shown near the contact buttons. */
   notes: z.string().optional(),
 });
@@ -102,7 +92,6 @@ export const CreateSaleBody = z.object({
       email: z.string().email().optional(),
       sms: z.string().optional(),
       whatsapp: z.string().optional(),
-      useRelay: z.boolean().optional(),
       notes: z.string().max(500).optional(),
     })
     .optional(),
@@ -162,9 +151,6 @@ export const SaleSite = z
     subtitle: z.string().optional(),
     location: z.string().optional(),
     description: z.string().optional(),
-    /** ISO-8601 timestamp; shown as a countdown/ends-at badge. */
-    endsAt: z.string().optional(),
-    about: SaleAbout.optional(),
     contact: SaleContact.optional(),
     /** Theme id from packages/themes. */
     theme: z.enum(['conservative', 'retro', 'hip', 'artsy']).default('conservative'),
@@ -176,7 +162,6 @@ export const SaleSite = z
     slug: z.string().optional(),
     /** Host-only lifecycle timestamps (ISO-8601). */
     publishedAt: z.string().optional(),
-    archivedAt: z.string().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
     /**
