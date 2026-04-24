@@ -447,14 +447,17 @@ a {
   position: relative;
 }
 @media (max-width: 820px) {
-  /* Mobile: full-screen sheet, single scroll container. The whole modal
-     scrolls as one piece so the thumb works anywhere and contact info
-     is always reachable. */
+  /* Mobile: full-screen sheet, single scroll container. We switch from
+     grid to block layout here on purpose: with grid + height:100dvh, the
+     image row gets squeezed below its natural size (the browser tries to
+     fit all rows inside 100dvh), and the <img> overflows its container
+     onto the description. Block flow lets each section be its natural
+     height and overflow-y: auto handles the scroll cleanly. */
   .scrim {
     padding: 0;
   }
   .modal {
-    grid-template-columns: 1fr;
+    display: block;
     max-width: none;
     width: 100%;
     height: 100dvh;
@@ -463,6 +466,12 @@ a {
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+  }
+  /* Only reserve bottom space for the sticky contact bar when a contact
+     form is actually present. Reserved items skip the form, and we don't
+     want dead space under them. */
+  .modal:has(.form) {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 }
 .modal .close {
@@ -509,17 +518,26 @@ a {
   -webkit-user-drag: none;
 }
 @media (max-width: 820px) {
-  /* Mobile: image gets its natural height, capped at ~half the viewport so
-     title/price stay above the fold. `contain` preserves portraits
-     (letterboxed against the existing light-grey background) instead of
-     cropping them into weird slivers like `cover` did. */
+  /* Mobile image treatment. Hero-sized photo at top (no top padding needed —
+     the close button floats over the image). Capped at 50dvh so the title,
+     price, and first line of description are visible above the fold.
+     `object-fit: contain` preserves the whole photo and letterboxes against
+     the light grey background — feels premium and a little like Airbnb's
+     listing hero. */
   .modal .image {
     min-height: 0;
+    max-height: 50dvh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .modal .image img {
     height: auto;
-    max-height: 55dvh;
+    max-height: 50dvh;
+    width: 100%;
     object-fit: contain;
+    display: block;
   }
 }
 .modal .image .badge-abs {
@@ -608,43 +626,42 @@ a {
   gap: 16px;
 }
 @media (max-width: 820px) {
-  /* Single scroll on the modal; content scrolls as part of the page,
-     not inside its own box. Bottom padding clears the home indicator. */
+  /* Single scroll on the modal; content is just a normal block. */
   .modal .content {
     overflow: visible;
-    padding: 20px 20px max(24px, calc(env(safe-area-inset-bottom) + 16px));
+    padding: 22px 20px 12px;
+    gap: 14px;
   }
-  /* On mobile the dedicated header above the image owns title + price,
-     so the copies inside .content would be duplicate noise. Hide them. */
-  .modal .content > h2,
-  .modal .content > .price-block {
-    display: none;
+  /* Title gets larger and tighter on mobile. */
+  .modal .content > h2 {
+    font-size: 23px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
-}
-
-/* Mobile-only title header. Hidden on desktop (the in-content h2 +
-   price-block handle it there). On mobile this sits between the fixed
-   close button and the image, so the item name and price are always
-   the first thing a buyer sees. */
-.modal .item-header-mobile {
-  display: none;
-}
-@media (max-width: 820px) {
-  .modal .item-header-mobile {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    /* Right padding clears the 34px close button at right: 12px. Top
-       padding tracks the notch/island via the safe-area inset. */
-    padding: max(16px, calc(env(safe-area-inset-top) + 4px)) 60px 14px 20px;
-    background: var(--surface);
+  /* Price block scaled up. Price is the money moment; let it dominate. */
+  .modal .content > .price-block .num {
+    font-size: 30px;
   }
-  .modal .item-header-mobile h2 {
-    font-size: 20px;
-    line-height: 1.25;
-    letter-spacing: -0.015em;
-    margin: 0;
+  /* Description gets generous breathing room. */
+  .modal .content > .desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    padding: 4px 0 6px;
   }
+  /* Meta becomes a subtle divider line, not a full border. */
+  .modal .content > .meta {
+    font-size: 12px;
+    padding-top: 14px;
+  }
+  /* Share row: make it less prominent on mobile — sharing isn't the
+     primary action, contacting is. */
+  .modal .content > .share-row {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  /* The old in-content contact form becomes a fixed bottom sheet via
+     the .contact-bar class on mobile — see rules below. */
 }
 .modal h2 {
   font-size: 22px;
@@ -780,6 +797,53 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+/* Mobile: the contact form pops out of the scroll flow and locks to the
+   bottom of the viewport as a sticky action bar. Thumb-zone primary CTA
+   pattern — buyers can always reach email/SMS/WhatsApp with one tap,
+   regardless of scroll position. The modal adds bottom padding so the
+   last line of content isn't hidden under the bar. */
+@media (max-width: 820px) {
+  .modal .form {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px 14px max(12px, calc(env(safe-area-inset-bottom) + 8px));
+    background: color-mix(in oklab, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    gap: 0;
+    z-index: 5;
+    animation: slideUpSheet .28s ease;
+  }
+  .modal .form h3 {
+    display: none;
+  }
+  .modal .form .contact-row {
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: stretch;
+  }
+  .modal .form .contact-row .btn {
+    flex: 1 1 0;
+    padding: 13px 8px;
+    font-size: 14.5px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+}
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .form .error {

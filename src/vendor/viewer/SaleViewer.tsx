@@ -441,13 +441,6 @@ function Modal({
         <button type="button" className="close" onClick={onClose} aria-label="Close">
           ×
         </button>
-        {/* Mobile-only header. Put name and price above the image so the item
-            is always identified at a glance. Hidden on desktop via CSS; the
-            in-content copy below takes over there. */}
-        <div className="item-header-mobile" aria-hidden="true">
-          <h2>{item.title}</h2>
-          {priceBlock}
-        </div>
         <div className="image" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {reserved && <span className="badge reserved-badge badge-abs">Reserved</span>}
           {imgs[imgIdx] && <img src={imgs[imgIdx]} alt={item.title} />}
