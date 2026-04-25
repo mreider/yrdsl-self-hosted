@@ -6,6 +6,13 @@ export interface SaleViewerProps {
   items: SaleItem[];
   /** Locale suffix, e.g. "de" → reads `siteName_de` / `subtitle_de` from site. */
   locale?: string;
+  /**
+   * When the page URL is a path-based item deep-link (e.g.
+   * /matt/moving-sale/moccamaster-select-coffee-maker), pass the third
+   * segment in here so the modal opens on first paint without a flash
+   * of the grid. Takes precedence over the legacy `#item-id` hash.
+   */
+  initialItemSlug?: string;
 }
 
 function makeMoneyFormatter(currency: string, locale: string) {
@@ -34,30 +41,55 @@ function localized<T>(site: SaleSite, field: string, locale?: string): T | undef
   return s[field] as T | undefined;
 }
 
-export function SaleViewer({ site, items, locale }: SaleViewerProps) {
+export function SaleViewer({ site, items, locale, initialItemSlug }: SaleViewerProps) {
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<SortKey>('newest');
   const [hideReserved, setHideReserved] = useState(true);
   const [onlyReserved, setOnlyReserved] = useState(false);
   const [activeTags, setActiveTags] = useState<string[]>([]);
-  const [openItem, setOpenItem] = useState<SaleItem | null>(null);
+  const [openItem, setOpenItem] = useState<SaleItem | null>(() => {
+    // Synchronous initial-state fn so the modal is open on first paint
+    // when the URL is a path-based item deep-link (no flash of grid).
+    if (initialItemSlug) {
+      return items.find((i) => i.slug === initialItemSlug) ?? null;
+    }
+    return null;
+  });
 
-  // Deep-link support: #item-id opens that item.
+  // Path-based deep-link prop changes (rare — happens if the host
+  // navigates client-side between item URLs without a remount).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only re-run when slug changes
   useEffect(() => {
+    if (!initialItemSlug) return;
+    const found = items.find((i) => i.slug === initialItemSlug);
+    if (found) setOpenItem(found);
+  }, [initialItemSlug]);
+
+  // Legacy hash deep-link (#item-id). Skipped when the host already
+  // gave us a path-based slug, otherwise the hash would clobber it.
+  useEffect(() => {
+    if (initialItemSlug) return;
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       const found = items.find((i) => i.id === hash);
       if (found) setOpenItem(found);
     }
-  }, [items]);
+  }, [items, initialItemSlug]);
 
+  // Mirror the open item into the URL so refreshes keep state and
+  // copy-link gets the right form. Path-based when the host is using
+  // it (initialItemSlug truthy), otherwise legacy hash.
   useEffect(() => {
+    if (initialItemSlug !== undefined) {
+      // Path-mode: caller is in charge of routing. We don't push history.
+      return;
+    }
     if (openItem) {
       history.replaceState(null, '', `#${openItem.id}`);
     } else if (window.location.hash) {
       history.replaceState(null, '', window.location.pathname);
     }
-  }, [openItem]);
+  }, [openItem, initialItemSlug]);
 
   const allTags = useMemo(() => {
     const s = new Set<string>();
@@ -416,7 +448,16 @@ function Modal({
   const contact = site.contact;
 
   function share() {
-    const url = `${window.location.origin}${window.location.pathname}#${item.id}`;
+    // Prefer the path-based item URL so social-card crawlers (Facebook,
+    // Twitter, LinkedIn, iMessage) hit a server-rendered page with
+    // item-specific Open Graph tags. The pathname might already be an
+    // item URL (3 segments) if the user navigated here via path-based
+    // deep-link — strip back to /user/sale before appending. Falls
+    // back to the legacy hash form on items without a slug.
+    const origin = window.location.origin;
+    const segs = window.location.pathname.split('/').filter(Boolean);
+    const saleBase = `/${segs.slice(0, 2).join('/')}`;
+    const url = item.slug ? `${origin}${saleBase}/${item.slug}` : `${origin}${saleBase}#${item.id}`;
     navigator.clipboard?.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
