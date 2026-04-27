@@ -452,11 +452,11 @@ describe('SaleViewer: locale-specific field lookup', () => {
     });
 
     test('displays country without city when city is not set', () => {
-      const site = {
+      const site: { siteName: string; region?: { country: string; city?: string } } = {
         siteName: 'Sale',
         region: { country: 'DE' },
       };
-      expect(site.region.city).toBeUndefined();
+      expect(site.region?.city).toBeUndefined();
     });
 
     test('region display respects locale for country/city names', () => {
